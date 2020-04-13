@@ -2,8 +2,9 @@
 # coding: utf-8
 
 import argparse
+import csv
 import os
-from PIL import Image
+from PIL import Image, ImageDraw
 
 COLOR_BACKGROUND = (0, 0, 0, 255)
 COLOR_OBSTACLE = (255, 255, 255, 255)
@@ -17,14 +18,23 @@ def parse_args():
 
     parser.add_argument('-a', '--avoid_separation', type=str, help='Avoid separating the obstacles')
     parser.add_argument('-i', '--in_file', type=str, required=True, help='Input image')
-    parser.add_argument('-b', '--back_color', type=str, default="255,255,255", help='Background color to separate obstacles')
+    parser.add_argument('-b', '--back_color', type=str, default="255,255,255",
+                        help='Background color to separate obstacles')
     parser.add_argument('-d', '--delay', type=str, default=1000, help='Default delay')
-    parser.add_argument('-n', '--neighborhood', type=str, default="vn", help='Neighborhood type (moore, vn, emoore, evn)')
+    parser.add_argument('-n', '--neighborhood', type=str, default="vn",
+                        help='Neighborhood type (moore, vn, emoore, evn)')
     parser.add_argument('-m', '--top_name', type=str, help='Name of the resulting files')
     parser.add_argument('-o', '--out_path', type=str, default="out/", help='Output path')
-    parser.add_argument('-r', '--rules_file', type=str, default="templates/default_rules.inc", help='File with the rules to include in the main file')
+    parser.add_argument('-r', '--rules_file', type=str, default="templates/default_rules.inc",
+                        help='File with the rules to include in the main file')
     parser.add_argument('-t', '--tolerance', type=int, default=10, help='Tolerance when separating background')
     parser.add_argument('-w', '--width', type=int, help='Width of the resulting model')
+    parser.add_argument('-rp', '--revit_padding', type=int,
+                        help='Padding of the image generated with the Revit walls information')
+    parser.add_argument('-rw', '--revit_width', type=int,
+                        help='Width of the image generated with the Revit walls information')
+    parser.add_argument('-rl', '--revit_line_width', type=int,
+                        help='Width of the lines in the image generated with the Revit walls information')
 
     return parser.parse_args()
 
@@ -36,6 +46,66 @@ def almost_equal(v1, v2, ediff=20):
     return True
 
 
+def get_coord_bounds(revit_reader):
+    header = next(revit_reader)
+    min_x, max_x, min_y, max_y = float("inf"), float("-inf"), float("inf"), float("-inf")
+
+    for row in revit_reader:
+        row = dict(zip(header, row))
+
+        if float(row["src_z"]) != 0 or float(row["dst_z"]) != 0:
+            continue
+
+        src_x, dst_x = float(row["src_x"]), float(row["dst_x"])
+        src_y, dst_y = float(row["src_y"]), float(row["dst_y"])
+        min_x = min(min_x, src_x, dst_x)
+        max_x = max(max_x, src_x, dst_x)
+        min_y = min(min_y, src_y, dst_y)
+        max_y = max(max_y, src_y, dst_y)
+
+    return min_x, max_x, min_y, max_y
+
+
+def revit_csv_to_img(revit_csv, img_width, img_padding, img_line_width):
+    csv_file = open(revit_csv, "r")
+    csv_reader = csv.reader(csv_file, delimiter=",")
+
+    min_x, max_x, min_y, max_y = get_coord_bounds(csv_reader)
+
+    if img_padding is None:
+        img_padding = int(max_x - min_x)
+
+    if img_width is None:
+        img_width = int(20 * (max_x - min_x))
+
+    if img_line_width is None:
+        img_line_width = 10
+
+    img_height = int(img_width * ((max_y - min_y) / (max_x - min_x)))
+    im = Image.new(mode="RGB", size=(img_width + img_padding * 2, img_height + img_padding * 2))
+
+    csv_file.seek(0)
+    header = next(csv_reader)
+    imd = ImageDraw.Draw(im)
+
+    def get_im_x(x): return int(((x - min_x) / (max_x - min_x)) * img_width) + img_padding
+    def get_im_y(y): return int(((y - min_y) / (max_y - min_y)) * img_height) + img_padding
+
+    for row in csv_reader:
+        row = dict(zip(header, row))
+
+        if float(row["src_z"]) != 0 or float(row["dst_z"]) != 0:
+            continue
+
+        src_x, dst_x = get_im_x(float(row["src_x"])), get_im_x(float(row["dst_x"]))
+        src_y, dst_y = get_im_y(float(row["src_y"])), get_im_y(float(row["dst_y"]))
+        shape = [(src_x, src_y), (dst_x, dst_y)]
+        print(shape)
+        imd.line(shape, fill="white", width=img_line_width)
+
+    return im
+
+
 if __name__ == '__main__':
     args = parse_args()
 
@@ -45,7 +115,10 @@ if __name__ == '__main__':
 
     os.makedirs(os.path.join(args.out_path, args.top_name), exist_ok=True)
 
-    im = Image.open(args.in_file)
+    if args.in_file.endswith(".csv"):
+        im = revit_csv_to_img(args.in_file, args.revit_width, args.revit_padding, args.revit_line_width)
+    else:
+        im = Image.open(args.in_file)
     width, height = im.size
 
     cd_width = args.width
@@ -66,9 +139,8 @@ if __name__ == '__main__':
             else:
                 pixels[i, j] = COLOR_OBSTACLE
                 mat_id[-1].append(OBSTACLE_ID)
-        
-    im_res.save(os.path.join(args.out_path, args.top_name, args.top_name + ".png"))
 
+    im_res.save(os.path.join(args.out_path, args.top_name, args.top_name + ".png"))
 
     # Generation of initial values file (.val)
     with open(os.path.join(args.out_path, args.top_name, args.top_name + ".val"), "w") as out:
@@ -77,7 +149,6 @@ if __name__ == '__main__':
                 if mat_id[i][j] == OBSTACLE_ID:
                     line = "(%d, %d) = %d\n" % (j, i, OBSTACLE_ID)
                     out.write(line)
-
 
     # Generation of main file from template (.ma)
     with open("templates/template.ma", "r") as template:
@@ -103,7 +174,6 @@ if __name__ == '__main__':
         out.write(ma)
         out.write(rules)
 
-
     # Generation of palette file (.pal)
     pal_content = ""
     pal_line = "[%d;%d] %d %d %d\n"
@@ -113,4 +183,3 @@ if __name__ == '__main__':
 
     with open(os.path.join(args.out_path, args.top_name, args.top_name + ".pal"), "w") as out:
         out.write(pal_content)
-
