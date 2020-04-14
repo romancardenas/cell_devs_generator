@@ -29,8 +29,8 @@ def parse_args():
                         help='File with the rules to include in the main file')
     parser.add_argument('-t', '--tolerance', type=int, default=10, help='Tolerance when separating background')
     parser.add_argument('-w', '--width', type=int, help='Width of the resulting model')
-    parser.add_argument('-rp', '--revit_padding', type=int,
-                        help='Padding of the image generated with the Revit walls information')
+    parser.add_argument('-p', '--padding', type=int,
+                        help='Add a padding to the image before generate the Cell-DEVS environment')
     parser.add_argument('-rw', '--revit_width', type=int,
                         help='Width of the intermediate image generated with the Revit walls information')
     parser.add_argument('-rl', '--revit_line_width', type=int,
@@ -68,14 +68,11 @@ def get_coord_bounds(revit_reader):
     return min_x, max_x, min_y, max_y
 
 
-def revit_csv_to_img(revit_csv, img_width, img_padding, img_line_width):
+def revit_csv_to_img(revit_csv, img_width, img_line_width):
     csv_file = open(revit_csv, "r")
     csv_reader = csv.reader(csv_file, delimiter=",")
 
     min_x, max_x, min_y, max_y = get_coord_bounds(csv_reader)
-
-    if img_padding is None:
-        img_padding = int(max_x - min_x)
 
     if img_width is None:
         img_width = int(20 * (max_x - min_x))
@@ -84,14 +81,14 @@ def revit_csv_to_img(revit_csv, img_width, img_padding, img_line_width):
         img_line_width = 10
 
     img_height = int(img_width * ((max_y - min_y) / (max_x - min_x)))
-    im = Image.new(mode="RGB", size=(img_width + img_padding * 2, img_height + img_padding * 2))
+    im = Image.new(mode="RGB", size=(img_width, img_height))
 
     csv_file.seek(0)
     header = next(csv_reader)
     imd = ImageDraw.Draw(im)
 
-    get_im_x = lambda x: int(((x - min_x) / (max_x - min_x)) * img_width) + img_padding
-    get_im_y = lambda y: int(((y - min_y) / (max_y - min_y)) * img_height) + img_padding
+    get_im_x = lambda x: int(((x - min_x) / (max_x - min_x)) * img_width)
+    get_im_y = lambda y: int(((y - min_y) / (max_y - min_y)) * img_height)
 
     for row in csv_reader:
         row = dict(zip(header, row))
@@ -138,7 +135,7 @@ if __name__ == '__main__':
     os.makedirs(os.path.join(args.out_path, args.top_name), exist_ok=True)
 
     if args.in_file.endswith(".csv"):
-        im = revit_csv_to_img(args.in_file, args.revit_width, args.revit_padding, args.revit_line_width)
+        im = revit_csv_to_img(args.in_file, args.revit_width, args.revit_line_width)
     else:
         im = Image.open(args.in_file)
 
@@ -156,8 +153,13 @@ if __name__ == '__main__':
         while bottom > 0 and empty_row(im, bottom, back_color, args.tolerance): bottom -= 1
 
         im = im.crop((left, top, right, bottom))
-        im.save("tmp.png")
 
+    if args.padding:
+        new_im = Image.new("RGB", (im.width + args.padding*2, im.height + args.padding*2), tuple(back_color[:3]))
+        new_im.paste(im, (args.padding, args.padding))
+        im = new_im
+
+    im.save("tmp.png")
     width, height = im.size
 
     cd_width = args.width
