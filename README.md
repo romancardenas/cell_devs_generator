@@ -3,16 +3,13 @@
 Auxiliar script to generate Cell-DEVS environments based on images.
 
 ```
-usage: cd_generator.py [-h] [-a AVOID_SEPARATION] -i IN_FILE [-b BACK_COLOR]
+usage: cd_generator.py [-h] -i IN_FILE [-b BACK_COLOR]
                        [-d DELAY] [-n NEIGHBORHOOD] [-m TOP_NAME]
                        [-o OUT_PATH] [-r RULES_FILE] [-t TOLERANCE] [-w WIDTH]
                        [-bv BACK_VALUE] [-ov OBST_VALUE]
 
 optional arguments:
   -h, --help            show this help message and exit
-
-  -a AVOID_SEPARATION, --avoid_separation AVOID_SEPARATION
-                        Avoid separating the obstacles
 
   -i IN_FILE, --in_file IN_FILE
                         Input image
