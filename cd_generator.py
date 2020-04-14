@@ -17,6 +17,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Auxiliar script to generate Cell-DEVS environments')
 
     parser.add_argument('-i', '--in_file', type=str, required=True, help='Input image')
+    parser.add_argument('-c', '--crop', action="store_true", help='Crop image borders if no obstacle detected')
     parser.add_argument('-b', '--back_color', type=str, default="255,255,255",
                         help='Background color to separate obstacles')
     parser.add_argument('-d', '--delay', type=str, default=1000, help='Default delay')
@@ -31,7 +32,7 @@ def parse_args():
     parser.add_argument('-rp', '--revit_padding', type=int,
                         help='Padding of the image generated with the Revit walls information')
     parser.add_argument('-rw', '--revit_width', type=int,
-                        help='Width of the image generated with the Revit walls information')
+                        help='Width of the intermediate image generated with the Revit walls information')
     parser.add_argument('-rl', '--revit_line_width', type=int,
                         help='Width of the lines in the image generated with the Revit walls information')
     parser.add_argument('-bv', '--back_value', type=int, default=0, help='Value for background cells in .val output file')
@@ -107,6 +108,26 @@ def revit_csv_to_img(revit_csv, img_width, img_padding, img_line_width):
     return im
 
 
+def empty_row(img, row_idx, back_color, tolerance):
+    width = img.width
+    pixels = img.load()
+
+    for col_idx in range(width):
+        if not almost_equal(pixels[col_idx, row_idx][:3], back_color[:3], tolerance):
+            return False
+    return True
+
+
+def empty_col(img, col_idx, back_color, tolerance):
+    height = im.height
+    pixels = img.load()
+
+    for row_idx in range(height):
+        if not almost_equal(pixels[col_idx, row_idx][:3], back_color[:3], tolerance):
+            return False
+    return True
+
+
 if __name__ == '__main__':
     args = parse_args()
 
@@ -120,6 +141,23 @@ if __name__ == '__main__':
         im = revit_csv_to_img(args.in_file, args.revit_width, args.revit_padding, args.revit_line_width)
     else:
         im = Image.open(args.in_file)
+
+    if args.crop:
+        width, height = im.size
+
+        left = 0
+        right = width - 1
+        top = 0
+        bottom = height - 1
+
+        while left < width and empty_col(im, left, back_color, args.tolerance): left += 1
+        while right > 0 and empty_col(im, right, back_color, args.tolerance): right -= 1
+        while top < height and empty_row(im, top, back_color, args.tolerance): top += 1
+        while bottom > 0 and empty_row(im, bottom, back_color, args.tolerance): bottom -= 1
+
+        im = im.crop((left, top, right, bottom))
+        im.save("tmp.png")
+
     width, height = im.size
 
     cd_width = args.width
