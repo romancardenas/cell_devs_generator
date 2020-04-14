@@ -17,17 +17,22 @@ optional arguments:
   -b BACK_COLOR, --back_color BACK_COLOR
                         Background color to separate obstacles
 
+  -c, --crop            Crop image borders if no obstacle detected
+  
   -d DELAY, --delay DELAY
                         Default delay
-
-  -n NEIGHBORHOOD, --neighborhood NEIGHBORHOOD
-                        Neighborhood type (moore, vn, emoore, evn)
 
   -m TOP_NAME, --top_name TOP_NAME
                         Name of the resulting files
 
+  -n NEIGHBORHOOD, --neighborhood NEIGHBORHOOD
+                        Neighborhood type (moore, vn, emoore, evn)
+
   -o OUT_PATH, --out_path OUT_PATH
                         Output path
+
+  -p PADDING, --padding PADDING
+                        Add a padding to the image before generate the Cell-DEVS environment
 
   -r RULES_FILE, --rules_file RULES_FILE
                         File with the rules to include in the main file
@@ -37,10 +42,19 @@ optional arguments:
 
   -w WIDTH, --width WIDTH
                         Width of the resulting model
-  -bv BACK_VALUE, --back_value
+
+  -rw REVIT_WIDTH, --revit_width REVIT_WIDTH
+                        Width of the intermediate image generated with the Revit walls information
+
+  -rl REVIT_LINE_WIDTH, --revit_line_width REVIT_LINE_WIDTH
+                        Width of the lines in the image generated with the Revit walls information
+
+  -bv BACK_VALUE, --back_value BACK_VALUE
                         Value for background cells in .val output file
-  -ov OBST_VALUE, --obst_value
+
+  -ov OBST_VALUE, --obst_value OBST_VALUE
                         Value for obstacle cells in .val output file
+
 ```
 
 ### Examples (obstacle separation)
