@@ -35,6 +35,8 @@ def parse_args():
                         help='Width of the image generated with the Revit walls information')
     parser.add_argument('-rl', '--revit_line_width', type=int,
                         help='Width of the lines in the image generated with the Revit walls information')
+    parser.add_argument('-bv', '--back_value', type=int, help='Value for background cells in .val output file', default=0)
+    parser.add_argument('-ov', '--obst_value', type=int, help='Value for obstacle cells in .val output file', default=1)
 
     return parser.parse_args()
 
@@ -130,15 +132,18 @@ if __name__ == '__main__':
     pixels = im_res.load()
     mat_id = []
 
+    back_val = args.back_value
+    obst_val = args.obst_value
+
     for i in range(im_res.size[0]):
         mat_id.append([])
         for j in range(im_res.size[1]):
             if almost_equal(pixels[i, j][:3], back_color[:3], args.tolerance):
                 pixels[i, j] = COLOR_BACKGROUND
-                mat_id[-1].append(BACKGROUND_ID)
+                mat_id[-1].append(back_val)
             else:
                 pixels[i, j] = COLOR_OBSTACLE
-                mat_id[-1].append(OBSTACLE_ID)
+                mat_id[-1].append(obst_val)
 
     im_res.save(os.path.join(args.out_path, args.top_name, args.top_name + ".png"))
 
@@ -146,8 +151,8 @@ if __name__ == '__main__':
     with open(os.path.join(args.out_path, args.top_name, args.top_name + ".val"), "w") as out:
         for i in range(len(mat_id)):
             for j in range(len(mat_id[i])):
-                if mat_id[i][j] == OBSTACLE_ID:
-                    line = "(%d, %d) = %d\n" % (j, i, OBSTACLE_ID)
+                if mat_id[i][j] == obst_val:
+                    line = "(%d, %d) = %d\n" % (j, i, obst_val)
                     out.write(line)
 
     # Generation of main file from template (.ma)
@@ -166,7 +171,7 @@ if __name__ == '__main__':
                    width=cd_width,
                    height=cd_height,
                    delay=args.delay,
-                   initial_value=BACKGROUND_ID,
+                   initial_value=back_val,
                    val_file=args.top_name + ".val",
                    neighbors=neighborhood)
 
@@ -178,8 +183,8 @@ if __name__ == '__main__':
     pal_content = ""
     pal_line = "[%d;%d] %d %d %d\n"
 
-    pal_content += pal_line % ((BACKGROUND_ID, BACKGROUND_ID + 1) + COLOR_BACKGROUND[:3])
-    pal_content += pal_line % ((OBSTACLE_ID, OBSTACLE_ID + 1) + COLOR_OBSTACLE[:3])
+    pal_content += pal_line % ((back_val, back_val + 1) + COLOR_BACKGROUND[:3])
+    pal_content += pal_line % ((obst_val, obst_val + 1) + COLOR_OBSTACLE[:3])
 
     with open(os.path.join(args.out_path, args.top_name, args.top_name + ".pal"), "w") as out:
         out.write(pal_content)
