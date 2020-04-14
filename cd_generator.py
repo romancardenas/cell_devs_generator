@@ -16,7 +16,6 @@ OBSTACLE_ID = 1
 def parse_args():
     parser = argparse.ArgumentParser(description='Auxiliar script to generate Cell-DEVS environments')
 
-    parser.add_argument('-a', '--avoid_separation', type=str, help='Avoid separating the obstacles')
     parser.add_argument('-i', '--in_file', type=str, required=True, help='Input image')
     parser.add_argument('-b', '--back_color', type=str, default="255,255,255",
                         help='Background color to separate obstacles')
@@ -35,8 +34,8 @@ def parse_args():
                         help='Width of the image generated with the Revit walls information')
     parser.add_argument('-rl', '--revit_line_width', type=int,
                         help='Width of the lines in the image generated with the Revit walls information')
-    parser.add_argument('-bv', '--back_value', type=int, help='Value for background cells in .val output file', default=0)
-    parser.add_argument('-ov', '--obst_value', type=int, help='Value for obstacle cells in .val output file', default=1)
+    parser.add_argument('-bv', '--back_value', type=int, default=0, help='Value for background cells in .val output file')
+    parser.add_argument('-ov', '--obst_value', type=int, default=1, help='Value for obstacle cells in .val output file')
 
     return parser.parse_args()
 
@@ -90,8 +89,8 @@ def revit_csv_to_img(revit_csv, img_width, img_padding, img_line_width):
     header = next(csv_reader)
     imd = ImageDraw.Draw(im)
 
-    def get_im_x(x): return int(((x - min_x) / (max_x - min_x)) * img_width) + img_padding
-    def get_im_y(y): return int(((y - min_y) / (max_y - min_y)) * img_height) + img_padding
+    get_im_x = lambda x: int(((x - min_x) / (max_x - min_x)) * img_width) + img_padding
+    get_im_y = lambda y: int(((y - min_y) / (max_y - min_y)) * img_height) + img_padding
 
     for row in csv_reader:
         row = dict(zip(header, row))
