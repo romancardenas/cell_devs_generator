@@ -129,7 +129,7 @@ if __name__ == '__main__':
     print("Cell-DEVS model size: (%d, %d)" % (cd_height, cd_width))
 
     # Generation of the identifiers matrix
-    pixels = im_res.load()
+    pixels = im_res.convert('RGB').load()
     mat_id = []
 
     back_val = args.back_value
