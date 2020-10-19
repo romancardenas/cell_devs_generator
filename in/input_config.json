@@ -1,0 +1,30 @@
+{
+    "scenario": {
+        "wrapped": true,
+        "default_delay": "inertial",
+        "default_cell_type": "space",
+        "default_config": {
+          "space": {
+            "speed": 0.6
+          }
+        },
+        "neighborhood": [
+          {
+            "type": "von_neumann",
+            "range": 1,
+            "vicinity": {
+              "connection": 1,
+              "movement": 0.5
+            }
+          },
+          {
+            "type": "custom",
+            "neighbors": [[0, 0]],
+            "vicinity": {
+              "connection": 1,
+              "movement": 1
+            }
+          }
+        ]
+    }
+}

@@ -1,0 +1,29 @@
+{
+  "default": {
+    "color": [255, 255, 255],
+    "cell_type": "space",
+    "state": {
+      "type": "empty"
+    }
+  },
+  "others": [
+    {
+      "color": [110, 206, 29],
+      "state": {
+        "type": "fresh"
+      }
+    },
+    {
+      "color": [0, 133, 195],
+      "state": {
+        "type": "grocery"
+      }
+    },
+    {
+      "color": [227, 0, 103],
+      "state": {
+        "type": "checkout"
+      }
+    }
+  ]
+}
