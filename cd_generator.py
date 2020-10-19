@@ -63,7 +63,7 @@ if __name__ == '__main__':
             if best_color != colors['default']:
                 aux = deepcopy(best_color)
                 cell_id = aux.pop('color')
-                aux['cell_id'] = cell_id
+                aux['cell_id'] = [i, j]
                 cells.append(aux)
     im_res.save("{}/out.png".format(output_dir))
     config['cells'] = cells
