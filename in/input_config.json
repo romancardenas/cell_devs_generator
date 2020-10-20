@@ -2,12 +2,8 @@
     "scenario": {
         "wrapped": true,
         "default_delay": "inertial",
-        "default_cell_type": "space",
-        "default_config": {
-          "space": {
-            "speed": 0.6
-          }
-        },
+        "default_cell_type": "CO2",
+        "default_config": "TODO",
         "neighborhood": [
           {
             "type": "von_neumann",

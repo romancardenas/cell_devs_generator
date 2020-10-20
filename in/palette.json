@@ -1,28 +1,34 @@
 {
   "default": {
     "color": [255, 255, 255],
-    "cell_type": "space",
+    "cell_type": "CO2(change name)",
     "state": {
-      "type": "empty"
+      "type": "air"
     }
   },
   "others": [
     {
-      "color": [110, 206, 29],
+      "color": [47, 45, 194],
       "state": {
-        "type": "fresh"
+        "type": "chair"
       }
     },
     {
-      "color": [0, 133, 195],
+      "color": [228, 0, 28],
       "state": {
-        "type": "grocery"
+        "type": "table"
       }
     },
     {
-      "color": [227, 0, 103],
+      "color": [100, 100, 100],
       "state": {
-        "type": "checkout"
+        "type": "wall"
+      }
+    },
+    {
+      "color": [33, 165, 61],
+      "state": {
+        "type": "ac"
       }
     }
   ]
