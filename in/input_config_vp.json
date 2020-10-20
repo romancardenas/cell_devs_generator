@@ -1,0 +1,35 @@
+{
+"scenario": {
+        "shape": [
+            26,
+            58
+        ],
+        "wrapped": false,
+        "default_delay": "inertial",
+        "default_cell_type": "vp_cell",
+        "default_state": {
+            "counter": -1,
+            "concentration": 0,
+            "type": -100,
+            "breathing_counter": 0
+        },
+        "default_config": {
+            "vp_cell": {
+                "vp_production": 11,
+                "cell_size": 25,
+                "base": 0,
+                "resp_time": 1,
+                "breathing_rate": 20,
+                "time_active": 500,
+                "start_time": 20,
+                "infection_threshold": 1000,
+            }
+        },
+        "neighborhood": [
+            {
+                "type": "moore",
+                "range": 1
+            }
+        ]
+}
+}
