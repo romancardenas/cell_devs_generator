@@ -3,32 +3,32 @@
     "color": [255, 255, 255],
     "cell_type": "CO2(change name)",
     "state": {
-      "concentration": 0, "type": -100, "counter": -1}
+      "concentration": 0, "type": -100, "counter": -1
     }
   },
   "others": [
     {
-      "color": [0, 0, 0],
+      "color": [75, 75, 75],
       "state": {
-        "concentration": 0, "type": -700, "counter": -1}
+        "concentration": 0, "type": -700, "counter": -1
       }
     },
     {
-      "color": [237, 27, 36],
+      "color": [228, 0, 28],
       "state": {
-        "concentration": 0, "type": -500, "counter": -1}
+        "concentration": 0, "type": -500, "counter": -1
       }
     },
     {
-      "color": [254, 242, 0],
+      "color": [47, 45, 180],
       "state": {
-        "concentration": 0, "type": -300, "counter": -1}
+        "concentration": 0, "type": -300, "counter": -1
       }
     },
     {
       "color": [35, 177, 77],
       "state": {
-        "concentration": 0, "type": -600, "counter": -1}
+        "concentration": 0, "type": -600, "counter": -1
       }
     }
   ]

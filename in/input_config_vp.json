@@ -22,7 +22,7 @@
                 "breathing_rate": 20,
                 "time_active": 500,
                 "start_time": 20,
-                "infection_threshold": 1000,
+                "infection_threshold": 1000
             }
         },
         "neighborhood": [
