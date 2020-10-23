@@ -40,7 +40,7 @@ if __name__ == '__main__':
     im_res.save("{}/in_pixel.png".format(output_dir))
 
     # 2. We start adding the first elements to the JSON file
-    config['scenario']['shape'] = [cd_height, cd_width]
+    config['scenario']['shape'] = [cd_width, cd_height]
     config['scenario']['default_cell_type'] = colors['default']['cell_type']
     config['scenario']['default_state'] = colors['default']['state']
     # 3. We combine default and other colors into a palette object

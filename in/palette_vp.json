@@ -10,7 +10,7 @@
     {
       "color": [75, 75, 75],
       "state": {
-        "concentration": 0, "type": -700, "counter": -1
+        "concentration": 0, "type": -300, "counter": -1
       }
     },
     {
@@ -22,7 +22,7 @@
     {
       "color": [47, 45, 180],
       "state": {
-        "concentration": 0, "type": -300, "counter": -1
+        "concentration": 0, "type": -700, "counter": -1
       }
     },
     {
